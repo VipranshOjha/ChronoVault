@@ -9,6 +9,7 @@ export default function Navbar() {
     const allLinks = [
         { path: '/', label: 'Home' },
         { path: '/upload', label: 'Upload' },
+        { path: '/time-lock', label: 'Time Lock' },
         { path: '/retrieve', label: 'Retrieve' },
     ];
 

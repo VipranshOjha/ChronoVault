@@ -67,14 +67,12 @@ export default function Upload() {
             const text = await response.text();
             console.log("RAW RESPONSE:", text);
 
-            const data2 = JSON.parse(text);
-            console.log("PARSED DATA:", data2);
             if (!response.ok) {
-                const errText = await response.text();
-                alert(errText); // 🔥 show real backend error
+                alert(text);
                 return;
-              }
-            const data = await response.json();
+            }
+
+            const data = JSON.parse(text);
             console.log("UPLOAD RESPONSE:", data);
             const unlockTime = timerEnabled
                 ? new Date(Date.now() + Number(selectedDuration))
