@@ -208,7 +208,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
     print("  the stored face embedding.")
     print("-" * 40)
 
-    pin = getpass.getpass("  Vault PIN: ")
+    pin = input("  Vault PIN (visible): ")
 
     print("\n[Verify] 🔐 Decrypting stored embedding...")
     reference_embedding = store.load_embedding(user_id, pin)

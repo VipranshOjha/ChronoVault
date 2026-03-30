@@ -142,6 +142,24 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
             return
         store.delete_enrollment(user_id)
 
+    # 1.5 Get vault PIN from user (Prompting early avoids OpenCV terminal focus issues)
+    print("\n" + "-" * 40)
+    print("  Set your vault PIN")
+    print("  This PIN encrypts your face embedding at rest.")
+    print("  You will need it every time you verify.")
+    print("-" * 40)
+
+    while True:
+        pin = input("  Enter vault PIN (visible): ")
+        if len(pin) < 4:
+            print("  ⚠️  PIN must be at least 4 characters.")
+            continue
+        pin_confirm = input("  Confirm vault PIN (visible): ")
+        if pin != pin_confirm:
+            print("  ⚠️  PINs do not match. Try again.")
+            continue
+        break
+
     # 2. Open webcam
     print(f"\n[Enroll] Opening camera {camera_idx}...")
     cap = cv2.VideoCapture(camera_idx)
@@ -247,23 +265,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
         print(f"[Enroll] ⚠️  Low consistency ({avg_consistency:.4f} < {SIMILARITY_THRESHOLD})")
         print("[Enroll]    Consider re-enrolling with better lighting/stability.")
 
-    # 7. Get vault PIN from user
-    print("\n" + "-" * 40)
-    print("  Set your vault PIN")
-    print("  This PIN encrypts your face embedding at rest.")
-    print("  You will need it every time you verify.")
-    print("-" * 40)
 
-    while True:
-        pin = getpass.getpass("  Enter vault PIN: ")
-        if len(pin) < 4:
-            print("  ⚠️  PIN must be at least 4 characters.")
-            continue
-        pin_confirm = getpass.getpass("  Confirm vault PIN: ")
-        if pin != pin_confirm:
-            print("  ⚠️  PINs do not match. Try again.")
-            continue
-        break
 
     # 8. Encrypt and save
     print("\n[Enroll] 🔐 Encrypting and saving embedding...")
