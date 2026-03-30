@@ -1,13 +1,13 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Face Detector
+# ChronoVault - Facial Recognition Vault | Face Detector
 # ============================================================================
 # Wraps MTCNN (Multi-task Cascaded Convolutional Networks) from `facenet-pytorch`
 # for real-time face detection and alignment from webcam frames.
 #
 # MTCNN performs three tasks in a single pipeline:
-#   1. Face Detection — Locates faces in the image
-#   2. Landmark Detection — Finds eyes, nose, mouth positions
-#   3. Alignment — Crops and aligns the face to a canonical 160×160 pose
+#   1. Face Detection - Locates faces in the image
+#   2. Landmark Detection - Finds eyes, nose, mouth positions
+#   3. Alignment - Crops and aligns the face to a canonical 160×160 pose
 #
 # This alignment step is CRITICAL for embedding quality. FaceNet expects
 # consistently aligned inputs to produce reliable embeddings.
@@ -62,7 +62,7 @@ class FaceDetector:
             device=self.device,
         )
 
-        print(f"[Detector] ✅ MTCNN face detector initialized | Device: {self.device}")
+        print(f"[Detector] [OK] MTCNN face detector initialized | Device: {self.device}")
 
     def detect_face(self, frame: np.ndarray) -> Optional[torch.Tensor]:
         """
@@ -92,7 +92,7 @@ class FaceDetector:
         if faces is None or len(faces) == 0:
             return None
 
-        # Case 2: Multiple faces detected — SECURITY REJECTION
+        # Case 2: Multiple faces detected - SECURITY REJECTION
         # Filter by confidence first
         confident_faces = []
         for i, prob in enumerate(probs):
@@ -109,7 +109,7 @@ class FaceDetector:
             )
             return None
 
-        # Case 3: Exactly one confident face — return it
+        # Case 3: Exactly one confident face - return it
         face_idx = confident_faces[0]
         face_tensor = faces[face_idx]
 
@@ -160,7 +160,7 @@ class FaceDetector:
             first_box = boxes[confident_indices[0]].astype(int)
             return None, first_box, float(probs[confident_indices[0]]), num_confident
 
-        # Exactly one face — extract aligned tensor
+        # Exactly one face - extract aligned tensor
         idx = confident_indices[0]
         box = boxes[idx].astype(int)
         confidence = float(probs[idx])

@@ -1,25 +1,30 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BrainCircuit, Fingerprint, LockOpen } from 'lucide-react';
+import { BrainCircuit, Activity, LockOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 export default function EmotionalStateUnlock() {
   const [status, setStatus] = useState('idle'); // idle, processing, success, error
+  const [nlpText, setNlpText] = useState('');
   const [authData, setAuthData] = useState(null);
   const { session } = useAuth();
   const navigate = useNavigate();
 
   const handleAuthenticate = async () => {
+    if (!nlpText.trim()) {
+      toast.error('Input Required', { description: 'Please provide emotional text input.' });
+      return;
+    }
     if (!session?.access_token) {
       toast.error('Authentication Error', { description: 'Missing secure session token.' });
       return;
     }
 
     setStatus('processing');
-    toast.info('NLP Interrogation Pending', { 
-        description: 'Check the backend terminal to type your target emotional text sequence.'
+    toast.info('Running local RoBERTa inference...', { 
+        description: 'Piping data to deep learning engine natively.'
     });
 
     try {
@@ -28,7 +33,8 @@ export default function EmotionalStateUnlock() {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify({ text: nlpText })
       });
 
       if (!response.ok) {
@@ -58,60 +64,76 @@ export default function EmotionalStateUnlock() {
       >
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500/0 via-purple-500 to-purple-500/0 opacity-50" />
         
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/20 mb-6">
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-purple-500/10 border border-purple-500/20 mb-4">
             <BrainCircuit className="w-10 h-10 text-purple-400" />
           </div>
           <h2 className="text-3xl font-light text-white tracking-tight mb-2">Cognitive Verification</h2>
-          <p className="text-gray-400">Layer 4 / NLP Emotional State Constraint.</p>
+          <p className="text-gray-400 text-sm">Layer 4 / NLP Emotional State Constraint.</p>
         </div>
 
         <div className="space-y-6">
-          <div className="bg-white/5 border border-white/10 rounded-xl p-5 text-sm">
-            <h3 className="text-white font-medium flex items-center gap-2 mb-2">
-              <Fingerprint className="w-4 h-4 text-purple-400" /> Active Polygraph Engine
-            </h3>
-            <p className="text-gray-400 leading-relaxed">
-              Execution requires native integration isolated from web browser injection vectors. The backend 
-              terminal has initiated a secure terminal interface to analyze your current target state.
-            </p>
+          <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-4 flex items-center justify-center gap-3">
+            <div className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
+            </div>
+            <h3 className="text-purple-300 font-mono tracking-wide text-sm">Target Emotion: <span className="text-white font-bold ml-1">JOY</span></h3>
           </div>
 
           <AnimatePresence mode="wait">
             {status === 'idle' || status === 'error' ? (
-              <motion.div key="action" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <motion.div key="action" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
+                <div>
+                  <label className="block text-gray-400 text-xs uppercase tracking-wider mb-2 font-mono flex items-center gap-2">
+                    <Activity className="w-3 h-3"/> Polygraph Text Analysis Input
+                  </label>
+                  <textarea 
+                    value={nlpText}
+                    onChange={(e) => setNlpText(e.target.value)}
+                    placeholder="Speak or type your current thoughts..."
+                    className="w-full h-32 bg-black/30 border border-white/10 text-white placeholder-white/20 px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-sans resize-none"
+                  />
+                </div>
                 <button
                   onClick={handleAuthenticate}
-                  className="w-full relative group overflow-hidden rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 hover:bg-purple-500/10 transition-all duration-300 py-4 font-medium text-white"
+                  className="w-full relative group overflow-hidden rounded-xl bg-purple-600/20 border border-purple-500/30 hover:border-purple-500 hover:bg-purple-600/40 transition-all duration-300 py-4 font-medium text-white shadow-[0_0_20px_rgba(168,85,247,0.1)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]"
                 >
-                  <span className="relative z-10 font-bold tracking-wide">CONNECT NATIVE TERMINAL</span>
-                  <div className="absolute inset-0 bg-purple-500/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+                  <span className="relative z-10 font-bold tracking-wide">ANALYZE EMOTIONAL STATE</span>
+                  <div className="absolute inset-0 bg-purple-500/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
                 </button>
               </motion.div>
             ) : status === 'processing' ? (
               <motion.div key="processing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center py-6">
-                <div className="relative mb-4">
-                  <div className="w-16 h-16 rounded-full border-2 border-white/10 border-t-purple-500 animate-spin" />
-                  <BrainCircuit className="w-6 h-6 text-purple-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                <div className="relative mb-6">
+                  <div className="flex gap-2">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        className="w-3 h-10 bg-purple-500 rounded-full"
+                        animate={{ height: ["10px", "40px", "10px"] }}
+                        transition={{ repeat: Infinity, duration: 1, delay: i * 0.2 }}
+                      />
+                    ))}
+                  </div>
                 </div>
-                <p className="text-purple-400 font-medium animate-pulse">Native NLP Terminal is active...</p>
-                <p className="text-gray-500 text-sm mt-2">Switch to the backend console to provide input.</p>
+                <p className="text-purple-400 font-medium font-mono text-sm tracking-widest uppercase">Executing RoBERTa...</p>
               </motion.div>
             ) : (
-              <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-green-500/10 border border-green-500/20 p-6 rounded-xl text-center">
-                <LockOpen className="w-12 h-12 text-green-400 mx-auto mb-3" />
+              <motion.div key="success" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-xl text-center">
+                <LockOpen className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
                 <h3 className="text-xl font-medium text-white mb-1">State Verified</h3>
-                <p className="text-green-400/80 text-sm mb-4">Emotional constraints matched.</p>
+                <p className="text-emerald-400/80 text-sm mb-4">Emotional constraints matched threshold.</p>
                 
-                <div className="bg-black/50 p-3 rounded font-mono text-xs text-gray-400 mb-6 truncate border border-white/5">
-                  key: {authData?.mock_aes_key || "Unknown Payload"}
+                <div className="bg-black/50 p-3 rounded font-mono text-xs text-emerald-300 mb-6 truncate border border-emerald-500/20">
+                  <span className="text-gray-500">AES:</span> {authData?.mock_aes_key || "Unknown Payload"}
                 </div>
 
                 <button
                   onClick={() => navigate('/retrieve')}
-                  className="w-full bg-purple-600 text-white font-semibold py-3 rounded-lg hover:bg-purple-500 transition-colors"
+                  className="w-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 font-semibold py-3 rounded-lg hover:bg-emerald-500/30 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.2)]"
                 >
-                  Proceed to File Decryption →
+                  Confirm & Proceed to File Decryption →
                 </button>
               </motion.div>
             )}

@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Emotional State Vault | Verification Script
+# ChronoVault - Emotional State Vault | Verification Script
 # ============================================================================
 # Interactive CLI tool for verifying emotional state to unlock the vault.
 # ============================================================================
@@ -27,7 +27,7 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
         max_attempts: Number of allowed retries before lockout.
     """
     print("\n" + "=" * 60)
-    print("  CHRONOVAULT — EMOTIONAL STATE VAULT | VERIFICATION")
+    print("  CHRONOVAULT - EMOTIONAL STATE VAULT | VERIFICATION")
     print("=" * 60)
     print(f"  User ID         : {user_id}")
     print(f"  Target Emotion  : {TARGET_EMOTION.title()}")
@@ -37,7 +37,7 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
 
     # Initialize the NLP classifier (loads into memory)
     classifier = EmotionClassifier()
-    print("\n[Verify] ✅ Classifier ready. Enter text to analyze.")
+    print("\n[Verify] [OK] Classifier ready. Enter text to analyze.")
 
     attempts = 0
 
@@ -58,7 +58,7 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
 
         attempts += 1
         
-        print("\n[Verify] 🧠 Analyzing text...")
+        print("\n[Verify] [NLP] Analyzing text...")
         # We explicitly check for the target emotion mapped in the configuration
         is_match, detected_emotion, target_score, top_k = classifier.check_target_emotion(
             text_input, TARGET_EMOTION, CONFIDENCE_THRESHOLD
@@ -72,14 +72,14 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
             print(f"    {idx+1}. {entry['label'].title()}: {entry['score']:.4f}")
 
         if is_match:
-            print(f"\n[Verify] ✅ SUCCESS: Required emotion '{TARGET_EMOTION}' detected with confidence {target_score:.4f}.")
+            print(f"\n[Verify] [OK] SUCCESS: Required emotion '{TARGET_EMOTION}' detected with confidence {target_score:.4f}.")
             # Trigger Vault Unlock
             payload = mock_unlock(user_id, TARGET_EMOTION, target_score)
             display_unlock_payload(payload)
             return
 
         else:
-            print(f"\n[Verify] ❌ MISMATCH: Required emotion '{TARGET_EMOTION}' not reached (Score: {target_score:.4f} < {CONFIDENCE_THRESHOLD}).")
+            print(f"\n[Verify] [FAIL] MISMATCH: Required emotion '{TARGET_EMOTION}' not reached (Score: {target_score:.4f} < {CONFIDENCE_THRESHOLD}).")
             print(f"           Primary detected emotion was: {overall_top_emotion.title()} ({overall_top_score:.4f})")
             print(f"           Attempts remaining: {max_attempts - attempts}")
             
@@ -91,7 +91,7 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
 
     # Lockout after max attempts
     if attempts >= max_attempts:
-        print(f"\n[Verify] 🔒 LOCKOUT: Max attempts ({max_attempts}) exceeded.")
+        print(f"\n[Verify] [SECURE] LOCKOUT: Max attempts ({max_attempts}) exceeded.")
         payload = mock_deny(user_id, TARGET_EMOTION, 0.0, "Max attempts exceeded")
         display_deny_payload(payload)
 
@@ -102,7 +102,7 @@ def run_verification(user_id: str, max_attempts: int = MAX_VERIFICATION_ATTEMPTS
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="ChronoVault — Emotional State Vault Verification MVP",
+        description="ChronoVault - Emotional State Vault Verification MVP",
     )
     parser.add_argument(
         "--user-id",

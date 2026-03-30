@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Mock Vault Unlock
+# ChronoVault - Facial Recognition Vault | Mock Vault Unlock
 # ============================================================================
 # Simulates the AES decryption key release that occurs when the facial
 # recognition vault conditions are met.
@@ -83,14 +83,14 @@ def display_unlock_payload(payload: dict) -> None:
     """
     Display the vault unlock payload in a formatted, visually clear way.
 
-    This is the "victory screen" of the facial recognition vault —
+    This is the "victory screen" of the facial recognition vault -
     the moment the user sees their decryption key has been released.
 
     Args:
         payload: The unlock payload dict from mock_unlock().
     """
     print("\n" + "=" * 70)
-    print("  🔓  C H R O N O V A U L T  —  V A U L T  U N L O C K E D  🔓")
+    print("  🔓  C H R O N O V A U L T  -  V A U L T  U N L O C K E D  🔓")
     print("=" * 70)
     print(f"  Status       : {payload['status']}")
     print(f"  User         : {payload['user_id']}")
@@ -103,11 +103,11 @@ def display_unlock_payload(payload: dict) -> None:
     print(f"  🔑 AES-256 Decryption Key (Mock):")
     print(f"     {payload['mock_aes_key']}")
     print("=" * 70)
-    print(
-        "  ⚠️  In production, this key is released by the on-chain verifier"
-    )
+    print("=" * 70)
+    print("  In production, this key is released by the on-chain verifier")
     print("     after ZK proof submission (Step 6).")
     print("=" * 70 + "\n")
+    print(json.dumps(payload))
 
 
 def mock_deny(user_id: str, similarity_score: float, reason: str = "") -> dict:
@@ -143,7 +143,7 @@ def mock_deny(user_id: str, similarity_score: float, reason: str = "") -> dict:
 def display_deny_payload(payload: dict) -> None:
     """Display a formatted vault denial message."""
     print("\n" + "=" * 70)
-    print("  🔒  C H R O N O V A U L T  —  A C C E S S  D E N I E D  🔒")
+    print("  [SECURE]  C H R O N O V A U L T  -  A C C E S S  D E N I E D  [SECURE]")
     print("=" * 70)
     print(f"  Status       : {payload['status']}")
     print(f"  User         : {payload['user_id']}")

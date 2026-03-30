@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Security Utilities
+# ChronoVault - Facial Recognition Vault | Security Utilities
 # ============================================================================
 # Shared cryptographic primitives for embedding encryption at rest.
 # Uses Python's standard library `hashlib` and `os` for PBKDF2,
@@ -130,7 +130,7 @@ def decrypt_bytes(blob: bytes, password: str) -> Optional[bytes]:
     nonce_end = salt_end + AES_GCM_NONCE_LENGTH
 
     if len(blob) < nonce_end + 16:  # Minimum: salt + nonce + 16-byte tag
-        print("[Security] ❌ Encrypted blob is too short — possible corruption")
+        print("[Security] [FAIL] Encrypted blob is too short - possible corruption")
         return None
 
     salt = blob[:salt_end]
@@ -145,7 +145,7 @@ def decrypt_bytes(blob: bytes, password: str) -> Optional[bytes]:
         aesgcm = AESGCM(key)
         plaintext = aesgcm.decrypt(nonce, ciphertext_with_tag, None)
     except InvalidTag:
-        print("[Security] ❌ Authentication failed — wrong PIN or tampered data")
+        print("[Security] [FAIL] Authentication failed - wrong PIN or tampered data")
         return None
     finally:
         # Always scrub the key, even on failure

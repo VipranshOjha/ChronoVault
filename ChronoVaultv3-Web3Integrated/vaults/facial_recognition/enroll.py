@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Enrollment Script
+# ChronoVault - Facial Recognition Vault | Enrollment Script
 # ============================================================================
 # Interactive CLI tool for enrolling a user's face into the vault.
 #
@@ -20,7 +20,7 @@
 # Security:
 #   - Raw webcam frames exist only in RAM during the session
 #   - Only the encrypted mathematical embedding is persisted
-#   - The PIN is never stored — it derives the encryption key
+#   - The PIN is never stored - it derives the encryption key
 #   - Re-enrollment overwrites the previous vault file
 # ============================================================================
 
@@ -74,7 +74,7 @@ def draw_enrollment_ui(frame, face_box, confidence, num_faces, status_text, capt
         x1, y1, x2, y2 = face_box
 
         if num_faces == 1:
-            # Green box — single face, ready
+            # Green box - single face, ready
             color = (0, 255, 0)
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
             if confidence is not None:
@@ -83,7 +83,7 @@ def draw_enrollment_ui(frame, face_box, confidence, num_faces, status_text, capt
                     (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, color, 1
                 )
         else:
-            # Red box — multiple faces
+            # Red box - multiple faces
             color = (0, 0, 255)
             cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
             cv2.putText(
@@ -120,7 +120,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
         camera_idx: OpenCV camera device index (0 = default webcam).
     """
     print("\n" + "=" * 60)
-    print("  CHRONOVAULT — FACIAL RECOGNITION VAULT | ENROLLMENT")
+    print("  CHRONOVAULT - FACIAL RECOGNITION VAULT | ENROLLMENT")
     print("=" * 60)
     print(f"  User ID       : {user_id}")
     print(f"  Capture Frames: {num_frames}")
@@ -135,11 +135,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
     # Check for existing enrollment
     if store.user_exists(user_id):
-        print(f"\n[Enroll] ⚠️  User '{user_id}' already enrolled.")
-        overwrite = input("           Overwrite existing enrollment? (y/N): ").strip().lower()
-        if overwrite != "y":
-            print("[Enroll] Enrollment cancelled.")
-            return
+        print(f"\n[Enroll] ⚠️  User '{user_id}' already enrolled. Overwriting automatically.")
         store.delete_enrollment(user_id)
 
     # 1.5 Get vault PIN from user (Prompting early avoids OpenCV terminal focus issues)
@@ -161,22 +157,23 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
         break
 
     # 2. Open webcam
-    print(f"\n[Enroll] Opening camera {camera_idx}...")
-    cap = cv2.VideoCapture(camera_idx)
+    print(f"\n[Enroll] Opening camera {camera_idx}...", flush=True)
+    # Use DirectShow on Windows to prevent driver freezes
+    cap = cv2.VideoCapture(camera_idx, cv2.CAP_DSHOW) if sys.platform == "win32" else cv2.VideoCapture(camera_idx)
 
     if not cap.isOpened():
-        print("[Enroll] ❌ Failed to open webcam. Check your camera connection.")
+        print("[Enroll] [FAIL] Failed to open webcam. Check your camera connection.")
         sys.exit(1)
 
     # Set resolution (720p for better face detection)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-    print("[Enroll] ✅ Webcam opened. Position your face in the frame.")
-    print("[Enroll]    Press [SPACE] when ready to begin capture.")
+    print("[Enroll] [OK] Webcam opened. Position your face in the frame.")
+    print("[Enroll]    Auto-capture sequence will begin when a face is detected.")
     print("[Enroll]    Press [Q] to abort.\n")
 
-    # 3. Live preview loop — wait for user to press SPACE
+    # 3. Live preview loop - wait for user to press SPACE
     capturing = False
     captured_embeddings = []
     status_text = "Position your face and press [SPACE] to begin capture"
@@ -184,7 +181,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("[Enroll] ❌ Failed to read from webcam.")
+            print("[Enroll] [FAIL] Failed to read from webcam.")
             break
 
         # Detect face for UI overlay
@@ -193,11 +190,13 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
         # Draw UI
         if not capturing:
             if face_tensor is not None:
-                status_text = "Face detected! Press [SPACE] to begin capture"
+                status_text = "Face detected! Auto-capturing..."
+                capturing = True
+                print("[Enroll] 📸 Beginning capture sequence...")
             elif num_faces > 1:
                 status_text = f"REJECTED: {num_faces} faces detected (need exactly 1)"
             else:
-                status_text = "No face detected — adjust position/lighting"
+                status_text = "No face detected - adjust position/lighting"
 
         frame = draw_enrollment_ui(
             frame, face_box, confidence, num_faces,
@@ -206,19 +205,11 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
         cv2.imshow("ChronoVault Enrollment", frame)
 
-        # Handle key presses
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord("q"):
-            print("\n[Enroll] ❌ Enrollment aborted by user.")
+            print("\n[Enroll] [FAIL] Enrollment aborted by user.")
             break
-
-        if key == ord(" ") and not capturing:
-            if face_tensor is not None:
-                capturing = True
-                print("[Enroll] 📸 Beginning capture sequence...")
-            else:
-                print("[Enroll] ⚠️  No face detected — can't begin capture")
 
         # Capture frames when in capture mode
         if capturing and face_tensor is not None:
@@ -232,7 +223,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
             # Check if we have enough frames
             if len(captured_embeddings) >= num_frames:
-                print(f"\n[Enroll] ✅ All {num_frames} frames captured!")
+                print(f"\n[Enroll] [OK] All {num_frames} frames captured!")
                 break
 
     # 4. Release webcam
@@ -241,7 +232,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
     # 5. Process captured embeddings
     if len(captured_embeddings) < num_frames:
-        print(f"\n[Enroll] ❌ Only captured {len(captured_embeddings)}/{num_frames} frames.")
+        print(f"\n[Enroll] [FAIL] Only captured {len(captured_embeddings)}/{num_frames} frames.")
         print("[Enroll]    Enrollment incomplete. Please try again.")
         return
 
@@ -273,7 +264,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
     if success:
         print("\n" + "=" * 60)
-        print("  ✅  ENROLLMENT COMPLETE")
+        print("  [OK]  ENROLLMENT COMPLETE")
         print("=" * 60)
         print(f"  User ID         : {user_id}")
         print(f"  Embedding Dim   : {averaged_embedding.shape[0]}")
@@ -281,10 +272,12 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
         print(f"  Consistency     : {avg_consistency:.4f}")
         print(f"  Vault File      : data/{user_id}.vault")
         print("=" * 60)
-        print("  Next: Run  python verify.py --user-id", user_id)
+        
+        # This is the expected JSON output for the Go backend
+        print('{"status": "VAULT_ENROLLED"}')
         print("=" * 60 + "\n")
     else:
-        print("\n[Enroll] ❌ Enrollment failed. Check error messages above.")
+        print("\n[Enroll] [FAIL] Enrollment failed. Check error messages above.")
 
     # 9. Scrub sensitive data from memory
     del captured_embeddings, averaged_embedding, pin
@@ -298,7 +291,7 @@ def run_enrollment(user_id: str, num_frames: int, camera_idx: int):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="ChronoVault — Facial Recognition Vault Enrollment",
+        description="ChronoVault - Facial Recognition Vault Enrollment",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

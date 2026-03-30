@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Verification Script
+# ChronoVault - Facial Recognition Vault | Verification Script
 # ============================================================================
 # Real-time face verification against an enrolled identity.
 # Upon successful match, triggers the mock vault unlock (AES key release).
@@ -130,16 +130,16 @@ def draw_verification_ui(
         x1, y1, x2, y2 = face_box
 
         if num_faces > 1:
-            color = (0, 0, 255)  # Red — multi-face rejection
+            color = (0, 0, 255)  # Red - multi-face rejection
             label = f"REJECTED: {num_faces} faces"
         elif similarity is not None and similarity >= threshold:
-            color = (0, 255, 0)  # Green — match
+            color = (0, 255, 0)  # Green - match
             label = f"MATCH ({similarity:.3f})"
         elif similarity is not None:
-            color = (0, 100, 255)  # Orange — mismatch
+            color = (0, 100, 255)  # Orange - mismatch
             label = f"MISMATCH ({similarity:.3f})"
         else:
-            color = (255, 255, 0)  # Yellow — detecting
+            color = (255, 255, 0)  # Yellow - detecting
             label = "Detecting..."
 
         cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
@@ -181,7 +181,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
         camera_idx: OpenCV camera device index.
     """
     print("\n" + "=" * 60)
-    print("  CHRONOVAULT — FACIAL RECOGNITION VAULT | VERIFICATION")
+    print("  CHRONOVAULT - FACIAL RECOGNITION VAULT | VERIFICATION")
     print("=" * 60)
     print(f"  User ID         : {user_id}")
     print(f"  Threshold       : {threshold}")
@@ -198,7 +198,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
 
     # 2. Check enrollment exists
     if not store.user_exists(user_id):
-        print(f"[Verify] ❌ No enrollment found for user '{user_id}'.")
+        print(f"[Verify] [FAIL] No enrollment found for user '{user_id}'.")
         print(f"[Verify]    Run: python enroll.py --user-id {user_id}")
         sys.exit(1)
 
@@ -214,25 +214,25 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
     reference_embedding = store.load_embedding(user_id, pin)
 
     if reference_embedding is None:
-        print("[Verify] ❌ Failed to decrypt embedding. Wrong PIN or corrupted vault.")
+        print("[Verify] [FAIL] Failed to decrypt embedding. Wrong PIN or corrupted vault.")
         log_audit_event("VERIFY_FAIL", user_id, "reason=pin_decrypt_failed")
         sys.exit(1)
 
-    print(f"[Verify] ✅ Reference embedding loaded (shape: {reference_embedding.shape})")
+    print(f"[Verify] [OK] Reference embedding loaded (shape: {reference_embedding.shape})")
 
     # 4. Open webcam
-    print(f"\n[Verify] Opening camera {camera_idx}...")
-    cap = cv2.VideoCapture(camera_idx)
+    print(f"\n[Verify] Opening camera {camera_idx}...", flush=True)
+    cap = cv2.VideoCapture(camera_idx, cv2.CAP_DSHOW) if sys.platform == "win32" else cv2.VideoCapture(camera_idx)
 
     if not cap.isOpened():
-        print("[Verify] ❌ Failed to open webcam.")
+        print("[Verify] [FAIL] Failed to open webcam.")
         secure_delete(reference_embedding)
         sys.exit(1)
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
-    print("[Verify] ✅ Webcam opened. Look at the camera for verification.\n")
+    print("[Verify] [OK] Webcam opened. Look at the camera for verification.\n")
 
     # 5. Verification loop
     consecutive_matches = 0
@@ -244,7 +244,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
     while True:
         ret, frame = cap.read()
         if not ret:
-            print("[Verify] ❌ Failed to read from webcam.")
+            print("[Verify] [FAIL] Failed to read from webcam.")
             break
 
         frame_count += 1
@@ -303,7 +303,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
 
         # Check lockout
         if attempts >= MAX_VERIFICATION_ATTEMPTS:
-            print(f"\n[Verify] 🔒 LOCKOUT: Max attempts ({MAX_VERIFICATION_ATTEMPTS}) exceeded.")
+            print(f"\n[Verify] [SECURE] LOCKOUT: Max attempts ({MAX_VERIFICATION_ATTEMPTS}) exceeded.")
             log_audit_event("LOCKOUT", user_id, f"max_similarity={max_similarity_seen:.4f}")
             break
 
@@ -329,7 +329,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
 
     # 7. Process result
     if unlocked:
-        # VAULT UNLOCKED — trigger mock key release
+        # VAULT UNLOCKED - trigger mock key release
         payload = mock_unlock(user_id, max_similarity_seen)
         display_unlock_payload(payload)
     elif attempts >= MAX_VERIFICATION_ATTEMPTS:
@@ -352,7 +352,7 @@ def run_verification(user_id: str, threshold: float, camera_idx: int):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="ChronoVault — Facial Recognition Vault Verification",
+        description="ChronoVault - Facial Recognition Vault Verification",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

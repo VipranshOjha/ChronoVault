@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Emotional State Vault | RoBERTa Emotion Classifier
+# ChronoVault - Emotional State Vault | RoBERTa Emotion Classifier
 # ============================================================================
 # Wraps the SamLowe/roberta-base-go_emotions model from Hugging Face.
 #
@@ -224,7 +224,7 @@ class EmotionClassifier:
         detected_emotion, confidence, top_k = self.analyze_emotion(text)
 
         # Check if the TARGET emotion specifically meets the threshold
-        # (not just any emotion — must be the designated unlock emotion)
+        # (not just any emotion - must be the designated unlock emotion)
         target_score = 0.0
         for entry in top_k:
             if entry["label"] == target:

@@ -1,11 +1,11 @@
 # ============================================================================
-# ChronoVault — Emotional State Vault | Configuration
+# ChronoVault - Emotional State Vault | Configuration
 # ============================================================================
 # Central configuration for the Emotional State Vault (Step 4).
 #
 # This vault gates AES-256 decryption key release on the user's detected
 # emotional state. A pre-trained RoBERTa model (fine-tuned on the
-# GoEmotions dataset — 58K Reddit comments, 27 emotion labels + neutral)
+# GoEmotions dataset - 58K Reddit comments, 27 emotion labels + neutral)
 # classifies text input and triggers unlock only when the target emotion
 # is detected with sufficient confidence.
 #

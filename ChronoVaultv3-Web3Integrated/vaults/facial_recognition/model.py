@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Siamese Network Wrapper
+# ChronoVault - Facial Recognition Vault | Siamese Network Wrapper
 # ============================================================================
 # Wraps FaceNet (InceptionResnetV1) from the `facenet-pytorch` library.
 #
@@ -11,7 +11,7 @@
 #   - This metric learning approach is the core of Siamese networks
 #
 # The model runs in eval() mode (inference-only). No training happens here.
-# All weights are frozen — we only use the forward pass for embedding generation.
+# All weights are frozen - we only use the forward pass for embedding generation.
 # ============================================================================
 
 import torch
@@ -41,7 +41,7 @@ class FaceNetSiamese:
         Downloads pre-trained weights on first run (~107MB for VGGFace2).
         Subsequent runs load from cache (~/.cache/torch/checkpoints/).
         """
-        print("[Model] 🧠 Loading FaceNet (InceptionResnetV1) Siamese Network...")
+        print("[Model] [NLP] Loading FaceNet (InceptionResnetV1) Siamese Network...")
 
         # 1. Detect hardware
         self.device = get_device()
@@ -57,7 +57,7 @@ class FaceNetSiamese:
         # 3. Set to evaluation mode (disables dropout, uses running batch norm stats)
         self.model.eval()
 
-        print(f"[Model] ✅ FaceNet loaded successfully | Device: {self.device}")
+        print(f"[Model] [OK] FaceNet loaded successfully | Device: {self.device}")
         print(f"[Model]    Embedding dimension: {EMBEDDING_DIM}")
         print(f"[Model]    Weights: {PRETRAINED_MODEL}")
 
@@ -71,7 +71,7 @@ class FaceNetSiamese:
                          as output by MTCNN. Values should be in range [-1, 1].
 
         Returns:
-            A 1D tensor of shape (512,) — the L2-normalized face embedding.
+            A 1D tensor of shape (512,) - the L2-normalized face embedding.
 
         Security Note:
             The embedding is a mathematical representation of facial geometry.

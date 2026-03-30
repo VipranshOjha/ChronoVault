@@ -1,5 +1,5 @@
 """
-ChronoVault — Emotional State Vault | Smoke Test
+ChronoVault - Emotional State Vault | Smoke Test
 Validates that the NLP model loads and basic classification works.
 """
 

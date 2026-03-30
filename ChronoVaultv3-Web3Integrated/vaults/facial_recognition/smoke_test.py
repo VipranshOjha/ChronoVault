@@ -1,5 +1,5 @@
 """
-ChronoVault — Facial Recognition Vault | Smoke Test
+ChronoVault - Facial Recognition Vault | Smoke Test
 Validates that all components load and function correctly.
 """
 

@@ -1,9 +1,9 @@
 # ============================================================================
-# ChronoVault — Emotional State Vault | Shared Utilities
+# ChronoVault - Emotional State Vault | Shared Utilities
 # ============================================================================
 # Logging and helper functions shared across the emotional state vault.
 # Crypto utilities are lighter here than Step 3 (no embedding encryption
-# needed — text input is ephemeral and never stored).
+# needed - text input is ephemeral and never stored).
 # ============================================================================
 
 import datetime

@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Encrypted Embedding Storage
+# ChronoVault - Facial Recognition Vault | Encrypted Embedding Storage
 # ============================================================================
 # Handles secure persistence of face embeddings to the local filesystem.
 #
@@ -88,7 +88,7 @@ class EmbeddingStore:
             # 1. Validate embedding shape
             if embedding.shape != (EMBEDDING_DIM,):
                 print(
-                    f"[Store] ❌ Invalid embedding shape: {embedding.shape} "
+                    f"[Store] [FAIL] Invalid embedding shape: {embedding.shape} "
                     f"(expected ({EMBEDDING_DIM},))"
                 )
                 return False
@@ -114,13 +114,13 @@ class EmbeddingStore:
             secure_delete(embedding_np)
 
             file_size = os.path.getsize(vault_path)
-            print(f"[Store] ✅ Embedding saved: {vault_path} ({file_size} bytes)")
+            print(f"[Store] [OK] Embedding saved: {vault_path} ({file_size} bytes)")
             log_audit_event("ENROLL", user_id, f"vault_file={vault_path}")
 
             return True
 
         except Exception as e:
-            print(f"[Store] ❌ Failed to save embedding: {e}")
+            print(f"[Store] [FAIL] Failed to save embedding: {e}")
             return False
 
     def load_embedding(
@@ -149,7 +149,7 @@ class EmbeddingStore:
 
         # 1. Check enrollment exists
         if not os.path.exists(vault_path):
-            print(f"[Store] ❌ No enrollment found for user '{user_id}'")
+            print(f"[Store] [FAIL] No enrollment found for user '{user_id}'")
             return None
 
         try:
@@ -173,18 +173,18 @@ class EmbeddingStore:
             # 5. Validate shape
             if embedding.shape != (EMBEDDING_DIM,):
                 print(
-                    f"[Store] ❌ Loaded embedding has wrong shape: {embedding.shape}"
+                    f"[Store] [FAIL] Loaded embedding has wrong shape: {embedding.shape}"
                 )
                 return None
 
             # 6. Scrub plaintext bytes
             secure_delete(plaintext_bytes)
 
-            print(f"[Store] ✅ Embedding loaded and decrypted for user '{user_id}'")
+            print(f"[Store] [OK] Embedding loaded and decrypted for user '{user_id}'")
             return embedding
 
         except Exception as e:
-            print(f"[Store] ❌ Failed to load embedding: {e}")
+            print(f"[Store] [FAIL] Failed to load embedding: {e}")
             return None
 
     def delete_enrollment(self, user_id: str) -> bool:

@@ -1,5 +1,5 @@
 # ============================================================================
-# ChronoVault — Facial Recognition Vault | Configuration
+# ChronoVault - Facial Recognition Vault | Configuration
 # ============================================================================
 # Central configuration for the Facial Recognition Vault.
 # All security-critical parameters are defined here for easy auditing.
@@ -15,7 +15,7 @@ import torch
 # Base directory of this vault module
 VAULT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# Local encrypted embedding storage — NEVER synced to any remote/chain
+# Local encrypted embedding storage - NEVER synced to any remote/chain
 DATA_DIR = os.path.join(VAULT_DIR, "data")
 
 # Audit log for unlock events (append-only)
@@ -33,7 +33,7 @@ PRETRAINED_MODEL = "vggface2"
 # Dimensionality of the face embedding vector output by InceptionResnetV1
 EMBEDDING_DIM = 512
 
-# MTCNN face crop size — FaceNet expects 160x160 aligned face images
+# MTCNN face crop size - FaceNet expects 160x160 aligned face images
 IMAGE_SIZE = 160
 
 # Minimum confidence score for MTCNN face detection (0.0 - 1.0)
@@ -92,10 +92,9 @@ def get_device() -> torch.device:
     Consumer-grade NVIDIA GPUs (GTX 1060+) provide ~10x speedup.
     """
     if torch.cuda.is_available():
-        device = torch.device("cuda")
         gpu_name = torch.cuda.get_device_name(0)
-        print(f"[Config] 🟢 GPU detected: {gpu_name}")
+        print(f"[Config] [GPU] GPU detected: {gpu_name}")
+        return torch.device("cuda")
     else:
-        device = torch.device("cpu")
-        print("[Config] 🟡 No GPU detected — running on CPU (still performant)")
-    return device
+        print("[Config] [CPU] No GPU detected -- running on CPU (still performant)")
+        return torch.device("cpu")
